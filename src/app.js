@@ -33,4 +33,9 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 const cors = require("cors");
-app.use(cors());
+
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
