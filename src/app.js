@@ -24,7 +24,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 
 // ✅ PORT (important for Railway)
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 // ❌ Remove this after testing
 // console.log("ENV CHECK:", process.env.MONGO_URI);
