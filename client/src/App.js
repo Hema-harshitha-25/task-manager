@@ -25,13 +25,13 @@ function App() {
   const handleLogin = async () => {
   const res = await loginUser(form);
 
-  console.log(res); // check response
+  console.log("LOGIN RESPONSE:", res); // 👈 VERY IMPORTANT
+
+  alert(JSON.stringify(res)); // 👈 SHOW EXACT ERROR
 
   if (res.token) {
     setToken(res.token);
     localStorage.setItem("token", res.token);
-  } else {
-    alert(res.message || "Login failed");
   }
 };
 
