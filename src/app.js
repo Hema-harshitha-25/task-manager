@@ -35,6 +35,10 @@ app.listen(PORT, () => {
 const cors = require("cors");
 
 app.use(cors({
+  origin: "*"
+}));
+
+app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
