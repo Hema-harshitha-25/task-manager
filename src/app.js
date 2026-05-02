@@ -1,34 +1,11 @@
-require("dotenv").config();
+import React from "react";
 
-const express = require("express");
-const connectDB = require("./config/database");
+function App() {
+  return (
+    <div>
+      <h2>Frontend Working 🚀</h2>
+    </div>
+  );
+}
 
-const app = express();
-
-// ✅ Connect DB
-connectDB();
-
-// ✅ Middleware
-app.use(express.json());
-
-// ✅ Test route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
-// ✅ Routes
-const userRoutes = require("./routes/UserRoutes");
-const taskRoutes = require("./routes/TaskRoutes");
-
-app.use("/api/users", userRoutes);
-app.use("/api/tasks", taskRoutes);
-
-// ✅ PORT (important for Railway)
-const PORT = process.env.PORT || 8080;
-
-// ❌ Remove this after testing
-// console.log("ENV CHECK:", process.env.MONGO_URI);
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default App;
