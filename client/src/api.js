@@ -1,5 +1,6 @@
 const BASE_URL = "https://task-manager-production-57a6.up.railway.app";
 
+
 // REGISTER
 export const registerUser = async (data) => {
   const res = await fetch(`${BASE_URL}/api/users`, {
