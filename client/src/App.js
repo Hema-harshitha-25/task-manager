@@ -23,18 +23,19 @@ function App() {
 
   // LOGIN
   const handleLogin = async () => {
-  const res = await loginUser(form);
+  const res = await loginUser({
+    email: form.email,
+    password: form.password,
+  });
 
-  console.log("LOGIN RESPONSE:", res); // 👈 VERY IMPORTANT
-
-  alert(JSON.stringify(res)); // 👈 SHOW EXACT ERROR
+  console.log("LOGIN RESPONSE:", res);
+  alert(JSON.stringify(res)); // 👈 THIS WILL SHOW REAL ERROR
 
   if (res.token) {
     setToken(res.token);
     localStorage.setItem("token", res.token);
   }
 };
-
   // LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("token");
