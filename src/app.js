@@ -21,7 +21,7 @@ const userRoutes = require("./routes/UserRoutes");
 const taskRoutes = require("./routes/TaskRoutes");
 
 app.use("/api/users", userRoutes);
-app.use("/api/tasks", TaskRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // PORT
 const PORT = process.env.PORT || 3000;
