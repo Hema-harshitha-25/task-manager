@@ -1,19 +1,14 @@
 const BASE_URL = "http://192.168.29.71:5000"; 
-// OR Railway:
+// OR use Railway:
 // const BASE_URL = "https://task-manager-production-57a6.up.railway.app";
-
-// ================= USERS =================
 
 // REGISTER
 export const registerUser = async (data) => {
   const res = await fetch(`${BASE_URL}/api/users`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
   return res.json();
 };
 
@@ -21,16 +16,11 @@ export const registerUser = async (data) => {
 export const loginUser = async (data) => {
   const res = await fetch(`${BASE_URL}/api/users/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
   return res.json();
 };
-
-// ================= TASKS =================
 
 // GET TASKS
 export const getTasks = async (token) => {
@@ -39,7 +29,6 @@ export const getTasks = async (token) => {
       Authorization: `Bearer ${token}`,
     },
   });
-
   return res.json();
 };
 
@@ -53,7 +42,6 @@ export const createTask = async (token, data) => {
     },
     body: JSON.stringify(data),
   });
-
   return res.json();
 };
 
@@ -67,7 +55,6 @@ export const updateTask = async (token, id, data) => {
     },
     body: JSON.stringify(data),
   });
-
   return res.json();
 };
 
@@ -79,6 +66,5 @@ export const deleteTask = async (token, id) => {
       Authorization: `Bearer ${token}`,
     },
   });
-
   return res.json();
 };
