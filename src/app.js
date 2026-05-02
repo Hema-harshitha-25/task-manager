@@ -5,27 +5,30 @@ const connectDB = require("./config/database");
 
 const app = express();
 
-// connect database
+// ✅ Connect DB
 connectDB();
 
-// middleware
+// ✅ Middleware
 app.use(express.json());
 
-// test route
+// ✅ Test route
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// routes
+// ✅ Routes
 const userRoutes = require("./routes/UserRoutes");
 const taskRoutes = require("./routes/TaskRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 
-// PORT
-const PORT = process.env.PORT || 3000;
-console.log("ENV CHECK:", process.env.MONGO_URI);
+// ✅ PORT (important for Railway)
+const PORT = process.env.PORT || 8080;
+
+// ❌ Remove this after testing
+// console.log("ENV CHECK:", process.env.MONGO_URI);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
