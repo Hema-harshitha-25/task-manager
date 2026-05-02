@@ -1,5 +1,4 @@
-
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:5000";
 
 // REGISTER
 export const registerUser = async (data) => {
