@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://task-manager-production-57a6.up.railway.app";
 
 // REGISTER
 export const registerUser = async (data) => {
