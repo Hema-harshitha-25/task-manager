@@ -23,14 +23,17 @@ function App() {
 
   // LOGIN
   const handleLogin = async () => {
-    const res = await loginUser(form);
-    if (res.token) {
-      setToken(res.token);
-      localStorage.setItem("token", res.token);
-    } else {
-      alert("Login failed");
-    }
-  };
+  const res = await loginUser(form);
+
+  console.log(res); // check response
+
+  if (res.token) {
+    setToken(res.token);
+    localStorage.setItem("token", res.token);
+  } else {
+    alert(res.message || "Login failed");
+  }
+};
 
   // LOGOUT
   const handleLogout = () => {

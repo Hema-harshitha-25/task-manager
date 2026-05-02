@@ -1,12 +1,12 @@
-const BASE_URL = "http://192.168.29.71:5000"; 
-// OR use Railway:
-// const BASE_URL = "https://task-manager-production-57a6.up.railway.app";
+const BASE_URL = "http://localhost:5000"; // use your local backend
 
 // REGISTER
 export const registerUser = async (data) => {
   const res = await fetch(`${BASE_URL}/api/users`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
   return res.json();
@@ -16,7 +16,9 @@ export const registerUser = async (data) => {
 export const loginUser = async (data) => {
   const res = await fetch(`${BASE_URL}/api/users/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
   return res.json();
