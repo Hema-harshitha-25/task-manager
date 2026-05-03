@@ -4,9 +4,13 @@
   "description": "Task Manager",
   "main": "src/app.js",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "build": "cd client && npm install && npm run build"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",

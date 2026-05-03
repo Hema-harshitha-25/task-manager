@@ -1,6 +1,5 @@
 node_modules/
-mongo/
-package-lock.json
+client/node_modules/
+client/build/
 .env
-api.http
-
+*.log

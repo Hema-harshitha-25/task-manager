@@ -4,11 +4,12 @@ const UserMiddleware = require('../middlewares/UserMiddleware')
 const UserController = require('../controllers/UserControllers')
 const {
   validateCreateUser,
-  validateUpdateUser,
   validateLoginUser,
+  validateUpdateUser,
   validateUserId,
 } = require('../utils/validations')
 const router = express.Router()
+
 
 // Obtener todos los usuarios [GET]
 router.get('/', UserController.getAllUser)

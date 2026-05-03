@@ -1,64 +1,56 @@
-const BASE_URL = "https://task-manager-production-57a6.up.railway.app";
-// 👉 For local testing use this instead:
-// const BASE_URL = "http://192.168.29.71:5000";
+// Proxy in package.json forwards /api/* → http://localhost:5000
+// So we use relative URLs here — no CORS issues
+const BASE_URL = "";
 
 // ================= USERS =================
 
-// REGISTER
 export const registerUser = async (data) => {
   try {
     const res = await fetch(`${BASE_URL}/api/users`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
-    return await res.json();
+    const json = await res.json();
+    if (!res.ok) return { error: true, message: json.message || "Registration failed" };
+    return json;
   } catch (error) {
     console.error("Register Error:", error);
-    return { error: "Failed to register" };
+    return { error: true, message: "Cannot reach server. Is the backend running?" };
   }
 };
 
-// LOGIN
 export const loginUser = async (data) => {
   try {
     const res = await fetch(`${BASE_URL}/api/users/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
-    return await res.json();
+    const json = await res.json();
+    if (!res.ok) return { error: true, message: json.message || "Login failed" };
+    return json;
   } catch (error) {
     console.error("Login Error:", error);
-    return { error: "Failed to login" };
+    return { error: true, message: "Cannot reach server. Is the backend running?" };
   }
 };
 
 // ================= TASKS =================
 
-// GET TASKS
 export const getTasks = async (token) => {
   try {
     const res = await fetch(`${BASE_URL}/api/tasks`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-
-    return await res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Get Tasks Error:", error);
     return [];
   }
 };
 
-// CREATE TASK
 export const createTask = async (token, data) => {
   try {
     const res = await fetch(`${BASE_URL}/api/tasks`, {
@@ -69,7 +61,6 @@ export const createTask = async (token, data) => {
       },
       body: JSON.stringify(data),
     });
-
     return await res.json();
   } catch (error) {
     console.error("Create Task Error:", error);
@@ -77,7 +68,6 @@ export const createTask = async (token, data) => {
   }
 };
 
-// UPDATE TASK
 export const updateTask = async (token, id, data) => {
   try {
     const res = await fetch(`${BASE_URL}/api/tasks/${id}`, {
@@ -88,7 +78,6 @@ export const updateTask = async (token, id, data) => {
       },
       body: JSON.stringify(data),
     });
-
     return await res.json();
   } catch (error) {
     console.error("Update Task Error:", error);
@@ -96,16 +85,12 @@ export const updateTask = async (token, id, data) => {
   }
 };
 
-// DELETE TASK
 export const deleteTask = async (token, id) => {
   try {
     const res = await fetch(`${BASE_URL}/api/tasks/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-
     return await res.json();
   } catch (error) {
     console.error("Delete Task Error:", error);

@@ -1,145 +1,132 @@
-const User = require('../models/UserModel')
-const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
-const { validationResult } = require('express-validator')
-dotenv.config()
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/UserModel");
 
-// Iniciar sesión [POST]
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body
-
-  const user = await User.findOne({ email })
-  if (!user) {
-    return res.status(404).json({ message: 'Invalid email or password' })
-  }
-
-  const isMatch = await user.isValidPassword(password)
-  if (!isMatch) {
-    return res.status(400).json({ message: 'Invalid email or password' })
-  }
-
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
-  res.json({ token })
-}
-
-// Obtener todos los usuarios [GET]
-exports.getAllUser = async (req, res) => {
-  try {
-    const users = await User.find()
-    res.json(users)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-}
-
-// Obtener un usuario por su id [GET]
-exports.getUserById = async (req, res) => {
-  res.json(res.user)
-}
-
-// Crear un usuario [POST]
+// ================= REGISTER =================
 exports.createUser = async (req, res) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
-  }
-
   try {
-    const { name, email, password } = req.body
-
-    // Verificar si el correo electrónico ya está en uso
-    const existingUser = await User.findOne({ email })
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already in use' })
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    // Crear un nuevo usuario
-    const user = new User({
-      name,
-      email,
-      password,
-    })
+    const { name, email, password } = req.body;
 
-    const newUser = await user.save()
-    res.status(201).json(newUser)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Password is hashed by the UserModel pre-save hook — do NOT hash here
+    const user = new User({ name, email, password });
+    await user.save();
+
+    return res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-}
+};
 
-// Actualizar parcial un usuario [PATCH]
+// ================= LOGIN =================
+exports.loginUser = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+    }
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await user.isValidPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "1d" }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= GET ALL USERS =================
+exports.getAllUser = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= GET USER BY ID =================
+exports.getUserById = async (req, res) => {
+  try {
+    return res.status(200).json(res.user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= UPDATE USER (PARTIAL) =================
 exports.updateUserPartial = async (req, res) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
-  }
-
-  // Extraer el ID del usuario del token
-  const userIdFromToken = req.user._id
-
-  // Extraer el ID del usuario que se está actualizando de la ruta
-  const userIdFromRoute = req.params.id
-
-  // Verificar si el usuario que hace la petición es el mismo que se quiere actualizar
-  if (userIdFromToken.toString() !== userIdFromRoute) {
-    return res.status(403).json({ message: 'Forbidden' })
-  }
-
   try {
-    const updatedUser = await res.user.set(req.body).save()
-    res.json(updatedUser)
+    const { name, email, password } = req.body;
+    if (name !== undefined) res.user.name = name;
+    if (email !== undefined) res.user.email = email;
+    // Assign plain password — pre-save hook will hash it
+    if (password !== undefined) res.user.password = password;
+    await res.user.save();
+    return res.status(200).json({
+      id: res.user._id,
+      name: res.user.name,
+      email: res.user.email,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message });
   }
-}
+};
 
-// Actualizar un usuario COMPLETO [PUT]
+// ================= UPDATE USER (COMPLETE) =================
 exports.updateUserComplete = async (req, res) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() })
-  }
-
-  // Extraer el ID del usuario del token
-  const userIdFromToken = req.user._id
-
-  // Extraer el ID del usuario que se está actualizando de la ruta
-  const userIdFromRoute = req.params.id
-
-  // Verificar si el usuario que hace la petición es el mismo que se quiere actualizar
-  if (userIdFromToken.toString() !== userIdFromRoute) {
-    return res.status(403).json({ message: 'Forbidden' })
-  }
-
   try {
-    const updatedUser = await res.user.set(req.body).save()
-    res.json(updatedUser)
+    const { name, email, password } = req.body;
+    res.user.name = name;
+    res.user.email = email;
+    // Assign plain password — pre-save hook will hash it
+    if (password) res.user.password = password;
+    await res.user.save();
+    return res.status(200).json({
+      id: res.user._id,
+      name: res.user.name,
+      email: res.user.email,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message });
   }
-}
+};
 
-// Eliminar un usuario por su id [DELETE]
+// ================= DELETE USER =================
 exports.deleteUser = async (req, res) => {
-  // Extraer el ID del usuario del token
-  const userIdFromToken = req.user._id
-
-  // Extraer el ID del usuario que se está actualizando de la ruta
-  const userIdFromRoute = req.params.id
-
-  // Verificar si el usuario que hace la petición es el mismo que se quiere actualizar
-  if (userIdFromToken.toString() !== userIdFromRoute) {
-    return res.status(403).json({ message: 'Forbidden' })
-  }
-
   try {
-    const userDeleted = await res.user
-    await userDeleted.deleteOne()
-
-    res.json({
-      message: `User ${userDeleted.name} deleted successfully!`,
-    })
+    await res.user.deleteOne();
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    return res.status(500).json({ message: error.message });
   }
-}
+};

@@ -38,10 +38,9 @@ exports.validateCreateTask = [
     .isLength({ min: 5, max: 100 })
     .withMessage('Title must be between 5 and 100 characters'),
   body('description')
-    .notEmpty()
-    .withMessage('Description is required')
-    .isLength({ min: 10, max: 255 })
-    .withMessage('Description must be between 10 and 255 characters'),
+    .optional()
+    .isLength({ max: 255 })
+    .withMessage('Description must be at most 255 characters'),
   body('completed')
     .optional()
     .isBoolean()

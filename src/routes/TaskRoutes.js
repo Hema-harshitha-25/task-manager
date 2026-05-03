@@ -28,6 +28,15 @@ router.get(
   TaskController.getTask
 )
 
+// Actualizar una tarea [PATCH]
+router.patch(
+  '/:id',
+  validateUpdateTask,
+  AuthMiddleware.authenticate,
+  TaskMiddleware.findTask,
+  TaskController.updateTask
+)
+
 // Actualizar una tarea [PUT]
 router.put(
   '/:id',
