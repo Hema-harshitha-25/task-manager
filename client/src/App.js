@@ -151,20 +151,25 @@ function Dashboard({ token, user, onLogout }) {
     }
     setError("");
     setAdding(true);
-    await createTask(token, { title: taskTitle.trim() });
-    setTaskTitle("");
+    const res = await createTask(token, { title: taskTitle.trim() });
     setAdding(false);
-    fetchTasks();
+    if (res.error || res.errors) {
+      const msg = res.message || (res.errors && res.errors[0]?.msg) || "Failed to add task.";
+      setError(msg);
+      return;
+    }
+    setTaskTitle("");
+    await fetchTasks();
   };
 
   const handleToggle = async (id, completed) => {
     await updateTask(token, id, { completed: !completed });
-    fetchTasks();
+    await fetchTasks();
   };
 
   const handleDelete = async (id) => {
     await deleteTask(token, id);
-    fetchTasks();
+    await fetchTasks();
   };
 
   const filtered = tasks.filter((t) => {

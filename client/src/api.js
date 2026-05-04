@@ -61,10 +61,12 @@ export const createTask = async (token, data) => {
       },
       body: JSON.stringify(data),
     });
-    return await res.json();
+    const json = await res.json();
+    if (!res.ok) return { error: true, message: json.message, errors: json.errors };
+    return json;
   } catch (error) {
     console.error("Create Task Error:", error);
-    return { error: "Failed to create task" };
+    return { error: true, message: "Cannot reach server." };
   }
 };
 
