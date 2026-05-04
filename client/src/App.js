@@ -343,8 +343,28 @@ function Dashboard({ token, user, onLogout }) {
 }
 
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
+// Decode JWT and check if it's expired (no library needed)
+function isTokenExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true; // treat malformed token as expired
+  }
+}
+
 export default function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [token, setToken] = useState(() => {
+    const t = localStorage.getItem("token") || "";
+    if (t && isTokenExpired(t)) {
+      // Clear expired token immediately on load
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return "";
+    }
+    return t;
+  });
+
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("user")) || null; }
     catch { return null; }

@@ -1,6 +1,12 @@
 // Proxy in package.json forwards /api/* → http://localhost:5000
-// So we use relative URLs here — no CORS issues
 const BASE_URL = "";
+
+// Called by any 401 response to clear session and reload to login
+const handleUnauthorized = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "/"; // force reload → shows login page
+};
 
 // ================= USERS =================
 
@@ -43,6 +49,7 @@ export const getTasks = async (token) => {
     const res = await fetch(`${BASE_URL}/api/tasks`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (res.status === 401) { handleUnauthorized(); return []; }
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -61,6 +68,7 @@ export const createTask = async (token, data) => {
       },
       body: JSON.stringify(data),
     });
+    if (res.status === 401) { handleUnauthorized(); return { error: true, message: "Session expired. Please login again." }; }
     const json = await res.json();
     if (!res.ok) return { error: true, message: json.message, errors: json.errors };
     return json;
@@ -80,6 +88,7 @@ export const updateTask = async (token, id, data) => {
       },
       body: JSON.stringify(data),
     });
+    if (res.status === 401) { handleUnauthorized(); return { error: true }; }
     return await res.json();
   } catch (error) {
     console.error("Update Task Error:", error);
@@ -93,6 +102,7 @@ export const deleteTask = async (token, id) => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (res.status === 401) { handleUnauthorized(); return { error: true }; }
     return await res.json();
   } catch (error) {
     console.error("Delete Task Error:", error);
